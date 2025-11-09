@@ -11,7 +11,7 @@ symbols across selected lines.
 
 
 
-import random
+import secrets
 import time
 
 
@@ -57,7 +57,7 @@ def check_winnings(columns, lines, bet, values):
 
 def get_slot_machine_spin(rows, cols, symbols):
     """
-    Generates a random spin result based on symbol frequency.
+    Generates a cryptographically secure random spin result.
     """
     all_symbols = []
     for symbol, symbol_count in symbols.items():
@@ -69,13 +69,14 @@ def get_slot_machine_spin(rows, cols, symbols):
         column = []
         current_symbols = all_symbols[:]
         for _ in range(rows):
-            value = random.choice(current_symbols)
+            # Secure random symbol selection
+            value = secrets.choice(current_symbols)
             current_symbols.remove(value)
             column.append(value)
-            
-        columns.append(column)    
+        columns.append(column)
         
     return columns
+
 
 def print_slot_machine(columns):
     """
@@ -88,24 +89,27 @@ def print_slot_machine(columns):
             else:
                 print(column[row], end="")  
           
-            time.sleep(0.2)             
+            time.sleep(0.3)             
             
         print()    
             
 
 def deposit():
+    """
+    Secure deposit input validation to prevent invalid or negative entries.
+    """
     while True:
-        amount = input("Enter the Amount you want to deposit? $ ")
-        if amount.isdigit():
-            amount = int(amount)
-            if amount > 0:
-                break
-            else:
-                print("enter Amount greater than 0")
+        amount = input("Enter the amount you want to deposit: $ ").strip()
+        if not amount.isdigit():
+            print("❌ Please enter a valid positive number (digits only).")
+            continue
+        
+        amount = int(amount)
+        if amount <= 0:
+            print("⚠️ Deposit amount must be greater than zero.")
         else:
-            print("❌ Please enter a valid positive number")
-            
-    return amount 
+            return amount
+
 
 def number_of_lines():
     while True:
@@ -121,25 +125,34 @@ def number_of_lines():
             
     return lines 
 
+
 def get_bet():
+    """
+    Securely prompts the user for a valid bet amount with strict validation.
+    Prevents negative numbers, symbols, or empty input.
+    """
     while True:
-        amount = input(f"Enter your bet per line (${MIN_BET}-${MAX_BET}): ")
-        if amount.isdigit():
-            amount = int(amount)
-            if MIN_BET <= amount <= MAX_BET:
-                break
-            else:
-                print("❌ Invalid input. Please enter a number within the allowed range.")
+        amount = input(f"Enter your bet per line (${MIN_BET}-${MAX_BET}): ").strip()
+        
+        # Check if input is purely digits
+        if not amount.isdigit():
+            print("❌ Invalid input. Please enter a positive whole number.")
+            continue
+        
+        amount = int(amount)
+        
+        # Range validation
+        if amount < MIN_BET:
+            print(f"⚠️ Minimum bet per line is ${MIN_BET}.")
+        elif amount > MAX_BET:
+            print(f"⚠️ Maximum bet per line is ${MAX_BET}.")
         else:
-            print(f"❌ Invalid bet. Enter a number between {MIN_BET} and {MAX_BET}.")
-            
-    return amount 
+            return amount
+
  
 def spin(balance):
-    """
-    Handles a single spin round and returns balance change.
-    """
-
+    #Handles a single spin round and returns balance change.
+    
     lines = number_of_lines()
     while True:
         bet = get_bet()
@@ -151,6 +164,14 @@ def spin(balance):
             break    
             
     print(f"\n🎲 You are betting ${bet} on {lines} lines. Total Bet = ${total_bet} ")
+        
+    # Confirm bet if it's more than half of balance (extra safety)
+    if total_bet > balance / 2:
+        confirm = input(f"⚠️ You're betting more than half your balance (${balance}). Continue? (y/n): ").lower()
+        if confirm != "y":
+            print("Bet canceled. Adjust your bet amount.")
+            return 0
+
    
     slots = get_slot_machine_spin(ROWS, COLS, symbol_count)
     print_slot_machine(slots)
