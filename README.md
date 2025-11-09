@@ -1,12 +1,13 @@
 # Slot Machine Game Python
 
-A simple console-based slot machine game built in Python.  
+A simple yet cybersecurity-aware console-based slot machine game built in Python.  
 Players can deposit money, place bets, spin the reels, and win based on matching symbols.
 
 ## ✨ Features
-- Deposit and manage balance  
-- Choose number of lines to bet on (1–3)  
-- Random slot spin using Python’s `random` module  
+- Secure Random slot spin Generation using Python's 'secret' module
+- Safe Betting Logic : strict validation and warnings for high-risk or invalid bets.
+- Input Validation: Protects against invalid, non-numeric, or malformed user input.
+- User Balance Management: Prevents overdrawing and ensures safe transaction-like balance updates.
 - Win detection and payout calculation  
 - Option to redeposit after balance reaches 0
 
